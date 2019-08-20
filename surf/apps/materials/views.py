@@ -28,8 +28,8 @@ from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.decorators import action
 
-from surf.apps.filters.models import FilterCategory
-from surf.apps.filters.utils import IGNORED_FIELDS, add_default_filters
+from surf.apps.filters.models import FilterItem
+from surf.apps.filters.utils import IGNORED_FIELDS
 
 from surf.apps.materials.utils import (
     add_extra_parameters_to_materials,
@@ -99,7 +99,7 @@ class MaterialSearchAPIView(APIView):
             filters.append(dict(external_id=AUTHOR_FIELD_ID, items=[author]))
 
         # add default filters to search materials
-        filters = add_default_filters(filters)
+        #filters = add_default_filters(filters)
 
         data["filters"] = filters
 
@@ -135,9 +135,9 @@ def _get_filter_categories():
     Make list of filter categories in format "edurep_field_id:item_count"
     :return: list of "edurep_field_id:item_count"
     """
-    return ["{}:{}".format(f.edurep_field_id, f.max_item_count)
-            for f in FilterCategory.objects.all()
-            if f.edurep_field_id not in IGNORED_FIELDS]
+    return ["{}:{}".format(f.external_id, f.item_count)
+            for f in FilterItem.objects.all()
+            if f.external_id not in IGNORED_FIELDS]
 
 
 class KeywordsAPIView(APIView):
@@ -195,8 +195,8 @@ class MaterialAPIView(APIView):
                 api_endpoint=settings.EDUREP_XML_API_ENDPOINT)
 
             # add default filters to search materials
-            filters = add_default_filters([])
-
+            #filters = add_default_filters([])
+            filters = data.get("filters", [])
             res = ac.search([],
                             filters=filters,
                             ordering="-{}".format(PUBLISHER_DATE_FIELD_ID),

@@ -6,7 +6,7 @@ from django import forms
 from django.contrib import admin
 
 from surf.apps.themes import models
-from surf.apps.filters.models import FilterCategoryItem
+from surf.apps.filters.models import FilterItem
 
 from surf.vendor.edurep.xml_endpoint.v1_2.api import (
     CUSTOM_THEME_FIELD_ID,
@@ -23,14 +23,14 @@ class ThemeForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         try:
-            qs = FilterCategoryItem.objects
+            qs = FilterItem.objects
 
             # choose only Theme filter category items
-            t_qs = qs.filter(category__edurep_field_id=CUSTOM_THEME_FIELD_ID)
-            self.fields['filter_category_item'].queryset = t_qs.all()
+            t_qs = qs.filter(category__external_id=CUSTOM_THEME_FIELD_ID)
+            self.fields['filter_item'].queryset = t_qs.all()
 
             # choose only Discipline filter category items
-            d_qs = qs.filter(category__edurep_field_id=DISCIPLINE_FIELD_ID)
+            d_qs = qs.filter(category__external_id=DISCIPLINE_FIELD_ID)
             self.fields['disciplines'].queryset = d_qs.all()
         except AttributeError:
             pass

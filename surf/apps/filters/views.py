@@ -1,13 +1,10 @@
 """
 This module contains implementation of REST API views for filters app.
 """
-import time
 
-from collections import OrderedDict
 from types import SimpleNamespace
 
-from django.shortcuts import render
-from rest_framework import views, status, generics
+from rest_framework import status, generics
 from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -17,15 +14,10 @@ from rest_framework.viewsets import (
 )
 
 from surf.apps.filters.models import (
-    FilterCategory,
-    Filter,
-    MpttFilterItem
+    FilterItem
 )
 from surf.apps.filters.serializers import (
-    FilterCategorySerializer,
-    FilterSerializer,
-    FilterShortSerializer,
-    MpttFilterItemSerializer,
+    FilterItemSerializer,
 )
 from surf.apps.materials.views import MaterialSearchAPIView
 
@@ -35,42 +27,42 @@ class FilterCategoryViewSet(ListModelMixin,
     """
     Viewset class that provides `list()` action for Filter Category.
     """
-    queryset = FilterCategory.objects.all()
-    serializer_class = FilterCategorySerializer
+    queryset = FilterItem.objects.all()
+    serializer_class = FilterItemSerializer
     permission_classes = []
 
 
-class FilterViewSet(ModelViewSet):
-    """
-    Viewset class that provides CRUD actions for Filter.
-    """
-    queryset = Filter.objects.none()
-    serializer_class = FilterSerializer
-    permission_classes = [IsAuthenticated]
-    pagination_class = None
-
-    def get_serializer_class(self):
-        """
-        Returns serializer class depending on action method
-        """
-
-        if self.action == 'list':
-            return FilterShortSerializer
-
-        return FilterSerializer
-
-    def get_queryset(self):
-        """
-        Returns queryset only with current user filters
-        """
-
-        user = self.request.user
-        return Filter.objects.filter(owner_id=user.id).all()
+# class FilterViewSet(ModelViewSet):
+#     """
+#     Viewset class that provides CRUD actions for Filter.
+#     """
+#     queryset = Filter.objects.none()
+#     serializer_class = FilterSerializer
+#     permission_classes = [IsAuthenticated]
+#     pagination_class = None
+#
+#     def get_serializer_class(self):
+#         """
+#         Returns serializer class depending on action method
+#         """
+#
+#         if self.action == 'list':
+#             return FilterShortSerializer
+#
+#         return FilterSerializer
+#
+#     def get_queryset(self):
+#         """
+#         Returns queryset only with current user filters
+#         """
+#
+#         user = self.request.user
+#         return Filter.objects.filter(owner_id=user.id).all()
 
 
 class MpttFilterItems(generics.GenericAPIView):
-    serializer_class = MpttFilterItemSerializer
-    queryset = MpttFilterItem.objects.get_cached_trees()
+    serializer_class = FilterItemSerializer
+    queryset = FilterItem.objects.get_cached_trees()
 
     def get(self, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())

@@ -5,7 +5,7 @@ This module contains implementation of models for themes app.
 from django.db import models as django_models
 
 from surf.apps.core.models import UUIDModel
-from surf.apps.filters.models import FilterCategoryItem
+from surf.apps.filters.models import FilterItem
 from surf.apps.locale.models import Locale, LocaleHTML
 
 
@@ -20,15 +20,15 @@ class Theme(UUIDModel):
     external_id = django_models.CharField(max_length=255)
 
     # related Filter Category item
-    filter_category_item = django_models.OneToOneField(
-        FilterCategoryItem,
+    filter_item = django_models.OneToOneField(
+        FilterItem,
         related_name="theme",
         on_delete=django_models.SET_NULL,
         null=True, blank=True)
 
     # the list of related disciplines
     disciplines = django_models.ManyToManyField(
-        FilterCategoryItem,
+        FilterItem,
         related_name="parent_themes",
         blank=True)
 

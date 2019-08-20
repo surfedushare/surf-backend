@@ -19,7 +19,7 @@ from rest_framework.response import Response
 from surf.apps.communities.models import Community
 from surf.apps.materials.models import Collection, Material
 from surf.apps.themes.models import Theme
-from surf.apps.filters.models import FilterCategoryItem
+from surf.apps.filters.models import FilterItem
 from surf.apps.communities.filters import CommunityFilter
 from surf.apps.themes.serializers import ThemeSerializer
 from surf.apps.materials.views import get_materials_search_response
@@ -145,9 +145,8 @@ class CommunityViewSet(ListModelMixin,
 
         instance = self.get_object()
 
-        ids = instance.collections.values_list("materials__disciplines__id",
-                                               flat=True)
-        qs = FilterCategoryItem.objects.filter(id__in=ids)
+        ids = instance.collections.values_list("materials__disciplines__id", flat=True)
+        qs = FilterItem.objects.filter(id__in=ids)
 
         items = [d.external_id for d in qs.all()]
         drilldowns = get_material_count_by_disciplines(items)

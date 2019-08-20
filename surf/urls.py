@@ -13,14 +13,14 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf import settings
-from django.contrib import admin
-from django.urls import path
 from django.conf.urls import url, include
-from django.conf.urls.static import static
+from django.contrib import admin
 
-from surf.routers import CustomRouter
-
+from surf.apps.communities.views import CommunityViewSet
+from surf.apps.filters.views import (
+    # FilterViewSet,
+    MpttFilterItems
+)
 from surf.apps.materials.views import (
     MaterialSearchAPIView,
     MaterialRatingAPIView,
@@ -29,13 +29,8 @@ from surf.apps.materials.views import (
     CollectionViewSet,
     ApplaudMaterialViewSet
 )
-
-from surf.apps.filters.views import (
-    FilterCategoryViewSet,
-    FilterViewSet,
-    MpttFilterItems
-)
-
+from surf.apps.stats.views import StatsView
+from surf.apps.themes.views import ThemeViewSet
 from surf.apps.users.views import (
     auth_begin_handler,
     auth_complete_handler,
@@ -43,18 +38,14 @@ from surf.apps.users.views import (
     LogoutAPIView,
     UserDetailsAPIView
 )
-
-from surf.apps.communities.views import CommunityViewSet
-from surf.apps.themes.views import ThemeViewSet
-from surf.apps.stats.views import StatsView
+from surf.routers import CustomRouter
 
 admin.site.site_header = 'Surf'
 admin.site.site_title = 'Surf'
 admin.site.index_title = 'Surf'
 
 router = CustomRouter()
-router.register(r'filter-categories', FilterCategoryViewSet)
-router.register(r'filters', FilterViewSet)
+#router.register(r'filters', FilterViewSet)
 router.register(r'collections', CollectionViewSet)
 router.register(r'applaud-materials', ApplaudMaterialViewSet)
 router.register(r'communities', CommunityViewSet)
@@ -72,6 +63,7 @@ apipatterns = [
     url(r'^materials/', MaterialAPIView.as_view()),
     url(r'^localehtml/', MaterialAPIView.as_view()),
     url(r'^filteritems/', MpttFilterItems.as_view()),
+    url(r'^filter-categories/', MpttFilterItems.as_view()),
 ] + router.urls
 
 urlpatterns = [

@@ -38,6 +38,7 @@ AUTHOR_FIELD_ID = "lom.lifecycle.contribute.author"
 PUBLISHER_FIELD_ID = "lom.lifecycle.contribute.publisher"
 PUBLISHER_DATE_FIELD_ID = "lom.lifecycle.contribute.publisherdate"
 EDUCATIONAL_LEVEL_FIELD_ID = "lom.classification.obk.educationallevel.id"
+LANGUAGE_FIELD_ID = "lom.general.language"
 
 _DEFAULT_API_ENDPOINT = "http://wszoeken.edurep.kennisnet.nl:8000"
 
