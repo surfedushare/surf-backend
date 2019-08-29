@@ -114,7 +114,7 @@ class FilterItemSerializer(serializers.ModelSerializer):
 
     def get_children(self, obj):
         if obj.is_leaf_node():
-            return None
+            return []
         else:
             return FilterItemSerializer(obj.get_children(), many=True).data
 

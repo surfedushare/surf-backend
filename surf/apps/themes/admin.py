@@ -26,11 +26,11 @@ class ThemeForm(forms.ModelForm):
             qs = FilterItem.objects
 
             # choose only Theme filter category items
-            t_qs = qs.filter(category__external_id=CUSTOM_THEME_FIELD_ID)
+            t_qs = qs.filter(parent__external_id=CUSTOM_THEME_FIELD_ID)
             self.fields['filter_item'].queryset = t_qs.all()
 
             # choose only Discipline filter category items
-            d_qs = qs.filter(category__external_id=DISCIPLINE_FIELD_ID)
+            d_qs = qs.filter(parent__external_id=DISCIPLINE_FIELD_ID)
             self.fields['disciplines'].queryset = d_qs.all()
         except AttributeError:
             pass
@@ -46,4 +46,3 @@ class ThemeAdmin(admin.ModelAdmin):
     Provides admin options and functionality for Theme model.
     """
     form = ThemeForm
-    raw_id_fields = ("title_translations", "description_translations",)
