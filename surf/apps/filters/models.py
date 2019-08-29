@@ -11,7 +11,7 @@ from surf.apps.core.models import UUIDModel
 from surf.apps.locale.models import Locale
 
 
-class FilterItem(MPTTModel):
+class FilterItem(MPTTModel, UUIDModel):
     name = django_models.CharField(max_length=255)
     parent = TreeForeignKey('self', on_delete=django_models.CASCADE, null=True, blank=True, related_name='children')
 
@@ -20,7 +20,7 @@ class FilterItem(MPTTModel):
     deleted_from_edurep_at = django_models.DateTimeField(default=None, null=True, blank=True)
 
     title_translations = django_models.OneToOneField(to=Locale, on_delete=django_models.CASCADE, null=True, blank=False)
-    external_id = django_models.CharField(max_length=255, verbose_name="Field id in EduRep", blank=True, unique=True)
+    external_id = django_models.CharField(max_length=255, verbose_name="Field id in EduRep", blank=True)
     enabled_by_default = django_models.BooleanField(default=False)
     is_hidden = django_models.BooleanField(default=False)
 
