@@ -62,7 +62,6 @@ class FilterCategoryViewSet(ListModelMixin,
 
 class MpttFilterItems(generics.GenericAPIView):
     serializer_class = FilterItemSerializer
-    queryset = FilterItem.objects.get_cached_trees()
 
     def get(self, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -79,6 +78,9 @@ class MpttFilterItems(generics.GenericAPIView):
         for node in serializer.data:
             update_item_counts_for_node(node, item_counts)
         return Response(serializer.data, status.HTTP_200_OK)
+
+    def get_queryset(self):
+        return FilterItem.objects.get_cached_trees()
 
     def get_counts(self, request, **kwargs):
         filters = []
