@@ -1,14 +1,14 @@
 """
 This module contains implementation of models for communities app.
 """
-
-from django.db import models as django_models
+import re
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.db import models as django_models
 
 from surf.apps.core.models import UUIDModel
-
-from surf.apps.materials.models import Collection
 from surf.apps.locale.models import Locale, LocaleHTML
+from surf.apps.materials.models import Collection
 
 
 class SurfTeam(UUIDModel):
@@ -36,6 +36,15 @@ class SurfTeam(UUIDModel):
         verbose_name="Members",
         related_name='teams',
         blank=True)
+
+    def clean(self):
+        # Check whether the entered external_id is a valid URN.
+        # regex taken from the O'Reilly Regular Expressions Cookbook, 2nd Edition
+        # https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch08s06.html
+        regex = r"^urn:[a-z0-9][a-z0-9-]{0,31}:[a-z0-9()+,\-.:=@;$_!*'%/?#]+$"
+        if not re.match(regex, self.external_id):
+            raise ValidationError("SURFconext group id isn't a valid URN. Check "
+                                  "https://en.wikipedia.org/wiki/Uniform_Resource_Name for examples of valid URNs.")
 
     class Meta:
         ordering = ['name']
