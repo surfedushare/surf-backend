@@ -46,6 +46,10 @@ class SurfTeam(UUIDModel):
             raise ValidationError("SURFconext group id isn't a valid URN. Check "
                                   "https://en.wikipedia.org/wiki/Uniform_Resource_Name for examples of valid URNs.")
 
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+
     class Meta:
         ordering = ['name']
 
