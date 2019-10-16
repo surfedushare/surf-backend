@@ -23,6 +23,7 @@ from surf.apps.filters.serializers import (
     MpttFilterItemSerializer,
 )
 from surf.apps.materials.views import MaterialSearchAPIView
+IGNORED_IDS = ["lom.general.language", "custom_theme.id"]
 
 
 class FilterCategoryViewSet(ListModelMixin, GenericViewSet):
@@ -43,7 +44,7 @@ class FilterCategoryViewSet(ListModelMixin, GenericViewSet):
                 cls._update_item_counts_for_node(child_node, item_count_dict)
 
     def remove_zero_counts(self, input_node):
-        if not input_node['external_id'] == "lom.general.language":
+        if not input_node['external_id'] in IGNORED_IDS:
             for child in input_node['children']:
                 self.remove_zero_counts(child)
             input_node['children'] = [child for child in input_node['children']
