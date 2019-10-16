@@ -6,14 +6,6 @@ from django.contrib import admin
 
 
 from surf.apps.materials import models
-from surf.apps.materials.utils import update_materials_data
-
-
-def fill_material_data(model_admin, request, queryset):
-    update_materials_data(queryset.all())
-
-
-fill_material_data.short_description = "Fill material data"
 
 
 @admin.register(models.Material)
@@ -22,7 +14,7 @@ class MaterialAdmin(admin.ModelAdmin):
     Provides admin options and functionality for Material model.
     """
 
-    actions = [fill_material_data]
+    list_display = ("title", "external_id")
     readonly_fields = (
         'external_id', 'themes', 'disciplines', 'material_url', 'title',
         'description', 'keywords'

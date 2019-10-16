@@ -5,15 +5,69 @@ This module contains implementation of models for materials app.
 from datetime import datetime
 
 from django.db import models as django_models
-from django.conf import settings
 
 from surf.apps.core.models import UUIDModel
-from surf.apps.themes.models import Theme
 from surf.apps.filters.models import MpttFilterItem
-
+from surf.apps.themes.models import Theme
 
 RESOURCE_TYPE_MATERIAL = "material"
 RESOURCE_TYPE_COLLECTION = "collection"
+
+import json
+
+from django.conf import settings
+
+from surf.vendor.edurep.xml_endpoint.v1_2.api import (
+    XmlEndpointApiClient,
+    DISCIPLINE_FIELD_ID,
+    CUSTOM_THEME_FIELD_ID
+)
+
+
+_DISCIPLINE_FILTER = "{}:0".format(DISCIPLINE_FIELD_ID)
+
+
+def add_material_themes(material, themes):
+    ts = MpttFilterItem.objects.filter(external_id__in=themes).all()
+    material.themes.set(ts)
+
+
+def add_material_disciplines(material, disciplines):
+    ds = MpttFilterItem.objects.filter(external_id__in=disciplines).all()
+    material.disciplines.set(ds)
+
+
+def get_material_details_by_id(material_id, api_client=None):
+    """
+    Request from EduRep and return details of material by its EduRep id
+    :param material_id: id of material in EduRep
+    :param api_client: EduRep API client (optional)
+    :return: list of requested materials
+    """
+
+    if not api_client:
+        api_client = XmlEndpointApiClient(
+            api_endpoint=settings.EDUREP_XML_API_ENDPOINT)
+
+    res = api_client.get_materials_by_id(['"{}"'.format(material_id)],
+                                         drilldown_names=[_DISCIPLINE_FILTER])
+
+    # define themes and disciplines for requested material
+    themes = []
+    disciplines = []
+    for f in res.get("drilldowns", []):
+        if f["external_id"] == CUSTOM_THEME_FIELD_ID:
+            themes = [item["external_id"] for item in f["items"]]
+        elif f["external_id"] == DISCIPLINE_FIELD_ID:
+            disciplines = [item["external_id"] for item in f["items"]]
+
+    # set extra details for requested material
+    rv = res.get("records", [])
+    for material in rv:
+        material["themes"] = themes
+        material["disciplines"] = disciplines
+
+    return rv
 
 
 class Material(UUIDModel):
@@ -39,6 +93,21 @@ class Material(UUIDModel):
     title = django_models.TextField(blank=True, null=True)
     description = django_models.TextField(blank=True, null=True)
     keywords = django_models.TextField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        details = get_material_details_by_id(self.external_id)
+        m = details[0]
+        self.material_url = m.get("url")
+        self.title = m.get("title")
+        self.description = m.get("description")
+        keywords = m.get("keywords")
+        if keywords:
+            keywords = json.dumps(keywords)
+            self.keywords = keywords
+
+        super().save(*args, **kwargs)
+        add_material_themes(self, m.get("themes", []))
+        add_material_disciplines(self, m.get("disciplines", []))
 
     def __str__(self):
         return self.external_id
