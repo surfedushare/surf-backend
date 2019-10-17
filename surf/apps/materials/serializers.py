@@ -247,7 +247,9 @@ class ApplaudMaterialSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         external_id = validated_data["material"]["external_id"]
-        material, _ = Material.objects.get_or_create(external_id=external_id)
+        material, created = Material.objects.get_or_create(external_id=external_id)
+        if created:
+            material.sync_info()
         validated_data["material"] = material
 
         lookup_fields = {"material": material}

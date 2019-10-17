@@ -28,7 +28,7 @@ _DISCIPLINE_FILTER = "{}:0".format(DISCIPLINE_FIELD_ID)
 
 
 def add_material_themes(material, themes):
-    ts = MpttFilterItem.objects.filter(external_id__in=themes).all()
+    ts = Theme.objects.filter(external_id__in=themes).all()
     material.themes.set(ts)
 
 
@@ -94,7 +94,9 @@ class Material(UUIDModel):
     description = django_models.TextField(blank=True, null=True)
     keywords = django_models.TextField(blank=True, null=True)
 
-    def save(self, *args, **kwargs):
+    def sync_info(self):
+        assert self.external_id, "Can't sync info if instance doesn't have an external id"
+
         details = get_material_details_by_id(self.external_id)
         m = details[0]
         self.material_url = m.get("url")
@@ -105,7 +107,8 @@ class Material(UUIDModel):
             keywords = json.dumps(keywords)
             self.keywords = keywords
 
-        super().save(*args, **kwargs)
+        # always save info before adding themes & disciplines
+        self.save()
         add_material_themes(self, m.get("themes", []))
         add_material_disciplines(self, m.get("disciplines", []))
 
@@ -187,7 +190,9 @@ class ViewMaterial(UUIDModel):
         if not user or not user.id:
             return
 
-        m, _ = Material.objects.get_or_create(external_id=material_external_id)
+        m, created = Material.objects.get_or_create(external_id=material_external_id)
+        if created:
+            m.sync_info()
 
         ViewMaterial.objects.update_or_create(
             user_id=user.id, material_id=m.id,
