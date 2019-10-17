@@ -54,7 +54,7 @@ def update_materials_data(materials):
 
 
 def add_material_themes(material, themes):
-    ts = Theme.objects.filter(external_id__in=themes).all()
+    ts = MpttFilterItem.objects.filter(name__in=themes).all()
     material.themes.set(ts)
 
 
