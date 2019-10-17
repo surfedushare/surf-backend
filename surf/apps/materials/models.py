@@ -28,7 +28,7 @@ _DISCIPLINE_FILTER = "{}:0".format(DISCIPLINE_FIELD_ID)
 
 
 def add_material_themes(material, themes):
-    ts = Theme.objects.filter(external_id__in=themes).all()
+    ts = MpttFilterItem.objects.filter(name__in=themes).all()
     material.themes.set(ts)
 
 
@@ -80,14 +80,14 @@ class Material(UUIDModel):
                                           verbose_name="EduRep material id")
 
     # list of related themes
-    themes = django_models.ManyToManyField(Theme,
+    themes = django_models.ManyToManyField(MpttFilterItem,
                                            blank=True,
-                                           related_name="materials")
+                                           related_name="materials_mptt_themes")
 
     # list of related disciplines
     disciplines = django_models.ManyToManyField(MpttFilterItem,
                                                 blank=True,
-                                                related_name="materials")
+                                                related_name="materials_mptt_disciplines")
 
     material_url = django_models.URLField(blank=True, null=True)
     title = django_models.TextField(blank=True, null=True)
