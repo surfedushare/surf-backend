@@ -36,5 +36,5 @@ class CollectionAdmin(admin.ModelAdmin):
 
     list_display = ("title", "owner", "is_shared",)
     list_filter = ("owner", "is_shared",)
-    readonly_fields = ('title', 'owner', 'materials', 'is_shared',)
+    readonly_fields = ('title', 'owner', 'is_shared',)
     ordering = ("title",)
