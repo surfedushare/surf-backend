@@ -18,9 +18,10 @@ from rest_framework.response import Response
 
 from surf.apps.communities.models import Community
 from surf.apps.materials.models import Collection, Material
+from surf.apps.themes.models import Theme
 from surf.apps.filters.models import MpttFilterItem
-from surf.apps.filters.serializers import MpttFilterItemSerializer
 from surf.apps.communities.filters import CommunityFilter
+from surf.apps.themes.serializers import ThemeSerializer
 from surf.apps.materials.views import get_materials_search_response
 from surf.apps.filters.utils import get_material_count_by_disciplines
 
@@ -126,12 +127,14 @@ class CommunityViewSet(ListModelMixin,
 
         instance = self.get_object()
 
-        ids = instance.collections.values_list("materials__themes__name", flat=True)
-        qs = MpttFilterItem.objects.filter(name__in=ids)
+        ids = instance.collections.values_list("materials__themes__id",
+                                               flat=True)
+        qs = Theme.objects.filter(id__in=ids)
 
         res = []
         if qs.exists():
-            res = MpttFilterItemSerializer(many=True).to_representation(qs.all())
+            res = ThemeSerializer(many=True).to_representation(qs.all())
+
         return Response(res)
 
     @action(methods=['get'], detail=True)
