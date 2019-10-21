@@ -2,26 +2,35 @@
 This module contains implementation of models for materials app.
 """
 
+import json
 from datetime import datetime
 
+from django.conf import settings
 from django.db import models as django_models
+from django_enumfield import enum
 
 from surf.apps.core.models import UUIDModel
 from surf.apps.filters.models import MpttFilterItem
 from surf.apps.themes.models import Theme
-
-RESOURCE_TYPE_MATERIAL = "material"
-RESOURCE_TYPE_COLLECTION = "collection"
-
-import json
-
-from django.conf import settings
-
 from surf.vendor.edurep.xml_endpoint.v1_2.api import (
     XmlEndpointApiClient,
     DISCIPLINE_FIELD_ID,
     CUSTOM_THEME_FIELD_ID
 )
+
+RESOURCE_TYPE_MATERIAL = "material"
+RESOURCE_TYPE_COLLECTION = "collection"
+
+class PublishStatus(enum.Enum):
+    DRAFT = 0
+    REVIEW = 1
+    PUBLISHED = 2
+
+    __labels__ = {
+        DRAFT: "Draft",
+        REVIEW: "Review",
+        PUBLISHED: "Published",
+    }
 
 
 _DISCIPLINE_FILTER = "{}:0".format(DISCIPLINE_FIELD_ID)
@@ -134,8 +143,7 @@ class Collection(UUIDModel):
                                               blank=True,
                                               related_name="collections")
 
-    # does owner share the collection
-    is_shared = django_models.BooleanField(default=False)
+    publish_status = enum.EnumField(PublishStatus, default=PublishStatus.DRAFT)
 
     def __str__(self):
         return self.title
