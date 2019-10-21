@@ -10,6 +10,20 @@ from surf.apps.core.models import UUIDModel
 from surf.apps.locale.models import Locale, LocaleHTML
 from surf.apps.materials.models import Collection
 
+from django_enumfield import enum
+
+
+class PublishStatus(enum.Enum):
+    DRAFT = 0
+    REVIEW = 1
+    PUBLISHED = 2
+
+    __labels__ = {
+        DRAFT: "Draft",
+        REVIEW: "Review",
+        PUBLISHED: "Published",
+    }
+
 
 class SurfTeam(UUIDModel):
     """
@@ -62,6 +76,7 @@ class Community(UUIDModel):
     Implementation of Community model. Communities are related to
     SURFconext Teams.
     """
+    publish_status = enum.EnumField(PublishStatus, default=PublishStatus.DRAFT)
     name = django_models.CharField(max_length=255, blank=True)
     description = django_models.TextField(blank=True)
     title_translations = django_models.OneToOneField(to=Locale, on_delete=django_models.CASCADE,
@@ -95,11 +110,6 @@ class Community(UUIDModel):
         help_text="The proportion of the image should be 388x227")
 
     website_url = django_models.URLField(blank=True, null=True)
-
-    # is this community available for users
-    is_available = django_models.BooleanField(
-        verbose_name="Is community available in service",
-        default=True)
 
     # list of community collections
     collections = django_models.ManyToManyField(Collection,
