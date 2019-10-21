@@ -84,14 +84,7 @@ class Community(UUIDModel):
     description_translations = django_models.OneToOneField(to=LocaleHTML, on_delete=django_models.CASCADE,
                                                            null=True, blank=False)
 
-    # list of community members
     members = django_models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        verbose_name="Members",
-        related_name='communities',
-        blank=True)
-
-    new_members = django_models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         through='Team',
         blank=True,
