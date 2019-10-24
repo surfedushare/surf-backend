@@ -6,7 +6,6 @@ import re
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models as django_models
-from django.utils import timezone
 from django_enumfield import enum
 
 from surf.apps.core.models import UUIDModel
@@ -108,17 +107,6 @@ class Community(UUIDModel):
     class Meta:
         ordering = ['name']
         verbose_name_plural = 'Communities'
-
-    def restore(self):
-        self.deleted_at = None
-        self.save()
-
-    def delete(self, using=None, keep_parents=False):
-        if not self.deleted_at:
-            self.deleted_at = timezone.now()
-            self.save()
-        else:
-            super().delete(using=using, keep_parents=keep_parents)
 
     def __str__(self):
         return self.name
