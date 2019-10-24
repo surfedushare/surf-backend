@@ -4,8 +4,9 @@ This module provides django admin functionality for materials app.
 
 from django.contrib import admin
 
+
 from surf.apps.materials import models
-from surf.apps.materials.utils import BooleanDateFieldListFilter
+
 
 def trash_nodes(modeladmin, request, queryset):
     for obj in queryset:
@@ -23,24 +24,39 @@ def restore_nodes(modeladmin, request, queryset):
 restore_nodes.short_description = "Restore selected %(verbose_name_plural)s"
 
 
+class TrashListFilter(admin.SimpleListFilter):
+
+    title = 'is trash'
+    parameter_name = 'trash'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('1', 'Yes'),
+            ('0', 'No'),
+        )
+
+    def queryset(self, request, queryset):
+        value = self.value() or '0'
+        try:
+            is_trash = bool(int(value))
+        except ValueError:
+            is_trash = False
+        return queryset.filter(deleted_at__isnull=not is_trash)
+
+
 @admin.register(models.Material)
 class MaterialAdmin(admin.ModelAdmin):
     """
     Provides admin options and functionality for Material model.
     """
 
-    list_display = ("title", "external_id", "deleted",)
-    list_filter = (("deleted_at", BooleanDateFieldListFilter),)
+    list_display = ("title", "external_id")
+    list_filter = (TrashListFilter,)
     readonly_fields = (
         'external_id', 'themes', 'disciplines', 'material_url', 'title',
         'description', 'keywords', "deleted_at",
     )
     actions = [restore_nodes, trash_nodes]
-
-    def deleted(self, instance):
-        return instance.deleted_at is not None
-    deleted.boolean = True
-    deleted.short_description = 'Has been deleted'
 
     def get_actions(self, request):
         actions = super().get_actions(request)
@@ -65,16 +81,11 @@ class CollectionAdmin(admin.ModelAdmin):
     Provides admin options and functionality for Collection model.
     """
 
-    list_display = ("title", "owner", "publish_status", "deleted",)
-    list_filter = ("owner", "publish_status", ("deleted_at", BooleanDateFieldListFilter),)
+    list_display = ("title", "owner", "publish_status",)
+    list_filter = ("owner", "publish_status",)
     readonly_fields = ('title', 'owner', "deleted_at",)
     ordering = ("title",)
     actions = [restore_nodes, trash_nodes]
-
-    def deleted(self, instance):
-        return instance.deleted_at is not None
-    deleted.boolean = True
-    deleted.short_description = 'Has been deleted'
 
     def get_actions(self, request):
         actions = super().get_actions(request)

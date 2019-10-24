@@ -8,7 +8,6 @@ from django.core.files.images import get_image_dimensions
 
 from surf.apps.communities import models
 from surf.apps.communities.models import PublishStatus
-from surf.apps.materials.utils import BooleanDateFieldListFilter
 
 
 def trash_nodes(modeladmin, request, queryset):
@@ -25,6 +24,26 @@ def restore_nodes(modeladmin, request, queryset):
 
 
 restore_nodes.short_description = "Restore selected %(verbose_name_plural)s"
+
+
+class TrashListFilter(admin.SimpleListFilter):
+
+    title = 'is trash'
+    parameter_name = 'trash'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('1', 'Yes'),
+            ('0', 'No'),
+        )
+
+    def queryset(self, request, queryset):
+        value = self.value() or '0'
+        try:
+            is_trash = bool(int(value))
+        except ValueError:
+            is_trash = False
+        return queryset.filter(deleted_at__isnull=not is_trash)
 
 
 class CommunityForm(forms.ModelForm):
@@ -72,16 +91,11 @@ class CommunityAdmin(admin.ModelAdmin):
     """
     Provides admin options and functionality for Community model.
     """
-    list_display = ("name", "publish_status", "deleted")
-    list_filter = ("publish_status", ("deleted_at", BooleanDateFieldListFilter),)
+    list_display = ("name", "publish_status",)
+    list_filter = ("publish_status", TrashListFilter,)
     readonly_fields = ("deleted_at",)
     inlines = [TeamInline]
     form = CommunityForm
-
-    def deleted(self, instance):
-        return instance.deleted_at is not None
-    deleted.boolean = True
-    deleted.short_description = 'Has been deleted'
 
     actions = [restore_nodes, trash_nodes]
 

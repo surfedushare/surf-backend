@@ -5,35 +5,23 @@ This module contains some common functions for materials app.
 import json
 
 from django.conf import settings
-from django.contrib.admin.filters import DateFieldListFilter
 from django.db.models import Sum
-from django.utils.translation import gettext_lazy as _
 
 from surf.apps.communities.models import Community
+from surf.apps.themes.models import Theme
 from surf.apps.filters.models import MpttFilterItem
+
 from surf.apps.materials.models import (
     Material,
     ApplaudMaterial,
     ViewMaterial
 )
-from surf.apps.themes.models import Theme
+
 from surf.vendor.edurep.xml_endpoint.v1_2.api import (
     XmlEndpointApiClient,
     DISCIPLINE_FIELD_ID,
     CUSTOM_THEME_FIELD_ID
 )
-
-
-class BooleanDateFieldListFilter(DateFieldListFilter):
-    def __init__(self, field, request, params, model, model_admin, field_path):
-        super().__init__(field, request, params, model, model_admin, field_path)
-        self.title = "deleted"
-        self.field_generic = '%s__' % field_path
-        self.links = (
-            (_('Any date'), {}),
-            (_('Not deleted'), {self.field_generic + 'isnull': 'True'}),
-            (_('Has been deleted'), {self.field_generic + 'isnull': 'False'}),
-        )
 
 
 def update_materials_data(materials):
