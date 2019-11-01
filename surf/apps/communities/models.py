@@ -41,19 +41,6 @@ class SurfTeam(UUIDModel):
         related_name='teams',
         blank=True)
 
-    def clean(self):
-        # Check whether the entered external_id is a valid URN.
-        # regex taken from the O'Reilly Regular Expressions Cookbook, 2nd Edition
-        # https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch08s06.html
-        regex = r"^urn:[a-z0-9][a-z0-9-]{0,31}:[a-z0-9()+,\-.:=@;$_!*'%/?#]+$"
-        if not re.match(regex, self.external_id):
-            raise ValidationError("SURFconext group id isn't a valid URN. Check "
-                                  "https://en.wikipedia.org/wiki/Uniform_Resource_Name for examples of valid URNs.")
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
-
     class Meta:
         ordering = ['name']
 
