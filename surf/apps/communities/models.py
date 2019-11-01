@@ -59,7 +59,7 @@ class Community(UUIDModel):
     title_translations = django_models.OneToOneField(to=Locale, on_delete=django_models.CASCADE,
                                                      null=True, blank=True)
     description_translations = django_models.OneToOneField(to=LocaleHTML, on_delete=django_models.CASCADE,
-                                                           null=True, blank=False)
+                                                           null=True, blank=True)
     deleted_at = django_models.DateTimeField(null=True)
 
     members = django_models.ManyToManyField(
