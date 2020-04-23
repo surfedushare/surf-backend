@@ -451,7 +451,7 @@ class CollectionViewSet(ModelViewSet):
 
             add_material_themes(m, details[0].get("themes", []))
             add_material_disciplines(m, details[0].get("disciplines", []))
-            CollectionMaterial.objects.create(collection=instance, material=m)
+            CollectionMaterial.objects.get_or_create(collection=instance, material=m)
 
     @staticmethod
     def _delete_materials(instance, materials):
