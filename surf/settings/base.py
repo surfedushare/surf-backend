@@ -280,7 +280,7 @@ SOCIAL_AUTH_PIPELINE = (
 LOGIN_REDIRECT_URL = FRONTEND_BASE_URL + "/login/success"
 LOGOUT_REDIRECT_URL = "https://engine.surfconext.nl/logout"
 
-VOOT_API_ENDPOINT = os.environ.get('', 'https://voot.surfconext.nl')
+VOOT_API_ENDPOINT = os.environ.get('VOOT_API_ENDPOINT', 'https://voot.surfconext.nl')
 
 EDUREP_JSON_API_ENDPOINT = os.environ.get('EDUREP_JSON_API_ENDPOINT', 'https://proxy.edurep.nl/v3/search')
 EDUREP_XML_API_ENDPOINT = os.environ.get('EDUREP_XML_API_ENDPOINT', 'http://wszoeken.edurep.kennisnet.nl:8000')
