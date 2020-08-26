@@ -50,14 +50,17 @@ def get_groups(strategy, details, response, *args, **kwargs):
         None
     )
     if community_permission is None or not community_permission["is_allowed"]:
+        print("No permissions")
         details["groups"] = []
         return
     # Retrieve team data from Voot service to connect communities later
     vac = VootApiClient(api_endpoint=settings.VOOT_API_ENDPOINT)
     groups = vac.get_groups(response.get("access_token"))
     if not isinstance(groups, list):
+        print(groups)
         capture_message(f"VootApiClient didn't return a list but returned \"{groups}\" instead.")
         groups = []
+    print('Setting groups', groups)
     details["groups"] = groups
 
 
