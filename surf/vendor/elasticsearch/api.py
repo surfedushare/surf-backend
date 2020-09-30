@@ -216,6 +216,8 @@ class ElasticSearchApiClient:
                         "must": [{"terms": {"external_id": external_ids}}]
                     }
                 },
+                "from": 0,
+                "size": 100
             },
         )
         materials = self.parse_elastic_result(result)
